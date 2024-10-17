@@ -1,12 +1,12 @@
 package com.example.taskeffectivemobile
 
+import kotlin.time.Duration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -89,20 +88,10 @@ fun <T> Flow<T>.throttleFirst(timeoutMillis: Long): Flow<T> = flow {
     }
 }
 
-fun <T> Flow<T>.throttleLatest(timeoutMillis: Long): Flow<T> = channelFlow {
-    var lastValue: T? = null
-    val job = launch {
-        collect { value ->
-            lastValue = value
+fun <T> Flow<T>.throttleLatest(period: Duration): Flow<T> =
+    flow {
+        conflate().collect {
+            emit(it)
+            delay(period)
         }
     }
-
-    while (isActive) {
-        delay(timeoutMillis)
-        lastValue?.let {
-            send(it)
-            lastValue = null
-        }
-    }
-    job.cancelAndJoin()
-}
