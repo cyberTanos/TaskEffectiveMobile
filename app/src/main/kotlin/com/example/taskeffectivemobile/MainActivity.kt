@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Сделайте сетевой запрос и отобразите результат на экране
     private fun taskOne() {
         compositeDisposable.add(
             repository.getFirstTaskData()
@@ -52,6 +53,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    // Сделайте таймер. TextView которая раз в секунду меняется (timer)
     private fun taskTwo() {
         compositeDisposable.add(
             repository.getSecondTaskData()
@@ -63,6 +65,8 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    /* Сделайте ресайклер. По нажатию на элемент передавайте его позицию во фрагмент
+     и во фрагменте этот номер отображайте в тосте. (Subject)*/
     private fun taskThree() {
         binding.recycler.adapter = adapter
         val listName = listOf(
@@ -80,6 +84,8 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    /* Сделайте EditText. При наборе текста выводите в лог содержимое EditText всегда,
+     когда пользователь 3 секунды что-то не вводил (debounce)*/
     private fun taskFour() {
         binding.editText.doAfterTextChanged { text ->
             repository.behaviorSubject.onNext(text.toString())
@@ -95,6 +101,9 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    // Есть 2 сервера на которых лежат скидочные карты. Нужно получить эти данные и вывести в единый список. (zip и тд)
+    /* а) Если 1 из запросов падает, то все равно выводить
+     (найти метод RX для такого, чтоб самому не прописывать логику)*/
     private fun taskFive_1() {
         compositeDisposable.add(
             Observable.merge(
@@ -113,6 +122,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    // б) Если 1 из запросов падает, то не выводить ничего (найти метод RX)
     private fun taskFive_2() {
         compositeDisposable.add(
             Observable.merge(
